@@ -1,35 +1,43 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import SeasonDisplay from './SeasonDisplay'
+import Spinner from './Spinner';
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
+  // We can initialize state this way on in the #constructor() using this.state = { ... }
+  // The code below is actually syntax sure to awoid setting initial state state (>_<) in the #constructor()
+  state = { lat: null, errorMessage: '' };
 
-    // The component re-renders each time state changes
-    // We only do the direct assignment to state during its initialization
-    this.state = { lat: null, errorMessage: '' };
-
+  // Always prefer to make initial API calls in #componentDidMount() lifecycle method
+  // instead of making them in the constructor
+  componentDidMount() {
     window.navigator.geolocation.getCurrentPosition(
-      position =>  {
-        // Always call setState() to change the state
-        this.setState({ lat: position.coords.latitude })
-      },
-      err => {
-        this.setState({ errorMessage: err.message })
-      }
+      // Always call setState() to change the state
+      position =>  this.setState({ lat: position.coords.latitude }),
+      err => this.setState({ errorMessage: err.message })
     )
   }
 
-  render() { 
+  // prefer to place any conditional logic to separate helper function
+  renderContent() {
     if (this.state.errorMessage && !this.state.lat) {
       return <div>Error: {this.state.errorMessage}</div>
     }
 
     if (!this.state.errorMessage && this.state.lat) {
-      return <div>Latitude: {this.state.lat}</div>
+      return <SeasonDisplay lat={this.state.lat} />
     }
 
-    return <div>Loading...</div>
+    return <Spinner message="Please accept location request" />
+  }
+  
+  // presence of #render() function is mandatory for React components
+  render() { 
+    return (
+      <div className="border red">
+        {this.renderContent()}
+      </div>
+    )
   }
 }
 
