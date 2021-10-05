@@ -24,3 +24,5 @@ yarn-error.log*
 
 # Ignore local config file
 src/config.js
+
+.vercel
